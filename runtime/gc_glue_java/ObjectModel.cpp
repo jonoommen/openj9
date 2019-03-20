@@ -67,6 +67,11 @@ GC_ObjectModel::tearDown(MM_GCExtensionsBase *extensions)
 	}
 }
 
+IDATA
+GC_ObjectModel::GetHotFieldOffset(MM_ForwardedHeader *forwardedHeader) {
+	return getPreservedClass(forwardedHeader)->hotFieldOffset;
+}
+
 GC_ObjectModel::ScanType 
 GC_ObjectModel::getSpecialClassScanType(J9Class *objectClazz)
 {
@@ -99,11 +104,12 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 	J9VMThread *vmThread = classLoadEvent->currentThread;
 	J9Class *clazz = classLoadEvent->clazz;
 	
+	J9ROMClass *romClass = clazz->romClass;
+	J9UTF8* className = J9ROMCLASS_CLASSNAME(romClass);
+	clazz->hotFieldOffset =  1;
+
 	/* we're only interested in bootstrap classes */
 	if (clazz->classLoader == vmThread->javaVM->systemClassLoader) {
-		J9ROMClass *romClass = clazz->romClass;
-		J9UTF8* className = J9ROMCLASS_CLASSNAME(romClass);
-		
 		const char * const atomicMarkableReference = "java/util/concurrent/atomic/AtomicMarkableReference";
 		const char * const javaLangClassLoader = "java/lang/ClassLoader";
 		const char * const javaLangClass = "java/lang/Class";

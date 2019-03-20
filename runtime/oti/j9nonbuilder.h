@@ -3019,6 +3019,7 @@ typedef struct J9Class {
 	struct J9Class* nestHost;
 #endif /* defined(J9VM_OPT_VALHALLA_NESTMATES) */
 	struct J9FlattenedClassCache* flattenedClassCache;
+	IDATA hotFieldOffset;
 } J9Class;
 
 /* Interface classes can never be instantiated, so the following fields in J9Class will not be used:

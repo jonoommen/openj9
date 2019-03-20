@@ -2159,6 +2159,7 @@ TR_MarkHotField::mark(J9Class * clazz, bool isFixedClass)
       {
       setTracing(_comp->getOption(TR_TraceMarkingOfHotFields));
       visit(fej9->convertClassPtrToClassOffset(clazz));
+      clazz->hotFieldOffset = _slotIndex;
       }
    }
 
@@ -2181,7 +2182,6 @@ TR_MarkHotField::markHotField(J9Class * clazz, bool rootClass)
    UDATA noncoldWord= *(UDATA *)((char *)clazz + offsetOfHotFields());
    if (noncoldWord & _bitValue)
       return false;
-
    UDATA * descriptorPtr = clazz->instanceDescription;
    UDATA descriptorWord;
    if (((UDATA) descriptorPtr) & BCT_J9DescriptionImmediate)
