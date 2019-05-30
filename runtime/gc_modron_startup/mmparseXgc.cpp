@@ -1122,7 +1122,27 @@ j9gc_initialize_parse_gc_colon(J9JavaVM *javaVM, char **scan_start)
 		extensions->scavengerScanOrdering = MM_GCExtensions::OMR_GC_SCAVENGER_SCANORDERING_BREADTH_FIRST;
 		goto _exit;
 	}
+
+	/* see if we should be using dynamic depth copy order optimization for the scavenger (this is the default) */
+	if (try_scan(scan_start, "scvDynamicCopyOrder")) {
+		extensions->scavengerDynamicCopyOrder = true;
 		
+		extensions->scavengerScanOrdering = MM_GCExtensions::OMR_GC_SCAVENGER_SCANORDERING_BREADTH_FIRST;
+#if defined(J9VM_INTERP_NATIVE_SUPPORT)
+		extensions->scavengerAlignHotFields = false;
+#endif /* J9VM_INTERP_NATIVE_SUPPORT */
+		goto _exit;
+	}
+
+	/* see if we should disable dynamic depth copy order optimization in the scavenger */
+	if (try_scan(scan_start, "scvNoDynamicCopyOrder")) {
+		extensions->scavengerDynamicCopyOrder = false; 
+		extensions->scavengerScanOrdering = MM_GCExtensions::OMR_GC_SCAVENGER_SCANORDERING_HIERARCHICAL;
+#if defined(J9VM_INTERP_NATIVE_SUPPORT)
+		extensions->scavengerAlignHotFields = true;
+#endif /* J9VM_INTERP_NATIVE_SUPPORT */
+		goto _exit; 
+	}  
 #endif /* J9VM_GC_MODRON_SCAVENGER */
 
 	if(try_scan(scan_start, "alwaysCallWriteBarrier")) {
