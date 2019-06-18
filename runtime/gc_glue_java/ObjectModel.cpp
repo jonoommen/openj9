@@ -68,7 +68,7 @@ GC_ObjectModel::tearDown(MM_GCExtensionsBase *extensions)
 }
 
 IDATA
-GC_ObjectModel::GetHotFieldOffset(MM_ForwardedHeader *forwardedHeader) {
+GC_ObjectModel::getHotFieldOffset(MM_ForwardedHeader *forwardedHeader) {
 	return getPreservedClass(forwardedHeader)->hotFieldOffset;
 }
 
@@ -106,7 +106,7 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 	
 	J9ROMClass *romClass = clazz->romClass;
 	J9UTF8* className = J9ROMCLASS_CLASSNAME(romClass);
-	clazz->hotFieldOffset =  1;
+	clazz->hotFieldOffset =  0;
 
 	/* we're only interested in bootstrap classes */
 	if (clazz->classLoader == vmThread->javaVM->systemClassLoader) {

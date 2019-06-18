@@ -165,7 +165,7 @@ private:
 	}
 
 public:
-	IDATA GetHotFieldOffset(MM_ForwardedHeader *forwardedHeader);
+	IDATA getHotFieldOffset(MM_ForwardedHeader *forwardedHeader);
 
 	/**
 	 * Determine the ScanType code for objects of the specified class. This code determines how instances should be scanned.
