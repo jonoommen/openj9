@@ -165,7 +165,14 @@ private:
 	}
 
 public:
-	IDATA getHotFieldOffset(MM_ForwardedHeader *forwardedHeader);
+	UDATA getHotFieldOffset(MM_ForwardedHeader *forwardedHeader);
+	void printHotFieldInfo(MM_ForwardedHeader *forwardedHeader, J9Object *objectPtr);
+	void printAllObjectClasses(MM_ForwardedHeader *forwardedHeader);
+	void printAllHotObjectClasses(MM_ForwardedHeader *forwardedHeader);
+	void printAllIndexableObjectClasses(MM_ForwardedHeader *forwardedHeader);
+	void printAllDepthCopiedHotObjects(MM_ForwardedHeader *forwardedHeader);
+	void printAllDepthFailedHotObjects(MM_ForwardedHeader *forwardedHeader);
+	void printDistanceObjects(MM_ForwardedHeader *forwardedHeader);
 
 	/**
 	 * Determine the ScanType code for objects of the specified class. This code determines how instances should be scanned.
@@ -212,7 +219,8 @@ public:
 			result = SCAN_PRIMITIVE_ARRAY_OBJECT;
 			break;
 		default:
-			result = SCAN_INVALID_OBJECT;
+			//result = SCAN_INVALID_OBJECT;
+			result = SCAN_MIXED_OBJECT;
 		}
 
 		return result;

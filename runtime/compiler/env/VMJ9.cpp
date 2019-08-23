@@ -2124,21 +2124,21 @@ void
 TR_MarkHotField::mark(J9Class * clazz, bool isFixedClass)
    {
    TR_J9VMBase *fej9 = (TR_J9VMBase *)(_comp->fe());
+   J9ROMClass* romClass = ((J9Class *)clazz)->romClass;
+   J9UTF8* name = J9ROMCLASS_CLASSNAME(romClass);
    if (fej9->isAOT_DEPRECATED_DO_NOT_USE())
       return;
 
-   if ((*(UDATA *)((char *)clazz + offsetOfHotFields()) & 0x1))
-      {
-      // temporary hack: tenure aligned classes can't have
-      // hot fields marked, we need another word for this
-      if (_comp->getOption(TR_TraceMarkingOfHotFields))
-         {
-         J9ROMClass* romClass = ((J9Class *)clazz)->romClass;
-         J9UTF8* name = J9ROMCLASS_CLASSNAME(romClass);
-         printf("Rejected class %.*s for hot field marking because it's marked for tenured alignment\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name));
-         }
-      return;
-      }
+ //  if ((*(UDATA *)((char *)clazz + offsetOfHotFields()) & 0x1))
+ //     {
+ //     // temporary hack: tenure aligned classes can't have
+ //     // hot fields marked, we need another word for this
+ //     if (_comp->getOption(TR_TraceMarkingOfHotFields))
+ //        {
+ //        printf("Rejected class %.*s for hot field marking because it's marked for tenured alignment\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name));
+ //        }
+ //     return;
+//    }
 
    if (!_symRef->getSymbol()->getShadowSymbol() || _symRef->isUnresolved() || !clazz)
       return;
@@ -2151,7 +2151,7 @@ TR_MarkHotField::mark(J9Class * clazz, bool isFixedClass)
       return;
 
    _bitValue = (UDATA)1 << _slotIndex;
-
+   
    if (!markHotField(clazz, true))
       return;
 
@@ -2159,7 +2159,6 @@ TR_MarkHotField::mark(J9Class * clazz, bool isFixedClass)
       {
       setTracing(_comp->getOption(TR_TraceMarkingOfHotFields));
       visit(fej9->convertClassPtrToClassOffset(clazz));
-      clazz->hotFieldOffset = _slotIndex;
       }
    }
 
@@ -2195,21 +2194,63 @@ TR_MarkHotField::markHotField(J9Class * clazz, bool rootClass)
    if (!(descriptorWord & _bitValue))
       return false;
 
+   J9ROMClass* romClass = ((J9Class *)clazz)->romClass;
+   J9UTF8* name = J9ROMCLASS_CLASSNAME(romClass);
+   
    if (_comp->getOption(TR_TraceMarkingOfHotFields))
       {
       if (rootClass)
          {
          int32_t len; char * s = _symRef->getOwningMethod(_comp)->fieldName(_symRef->getCPIndex(), len, _comp->trMemory());
-         printf("hot field %*s with bitValue=%x and slotIndex=%d found while compiling \n   %s\n", len, s, _bitValue, _slotIndex, _comp->signature());
+         printf("hot field %*s with bitValue=%x and slotIndex=%d found while compiling \n   %s, method hotness=%d\n", len, s, _bitValue, _slotIndex, _comp->signature(),_comp->getMethodHotness());
          }
 
-      J9ROMClass* romClass = ((J9Class *)clazz)->romClass;
-      J9UTF8* name = J9ROMCLASS_CLASSNAME(romClass);
-      printf("%*smarked field as hot in class %.*s\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name));
+      //J9ROMClass* romClass = ((J9Class *)clazz)->romClass;
+      //J9UTF8* name = J9ROMCLASS_CLASSNAME(romClass);
+ /*        switch(_comp->getMethodHotness())
+      {
+      case noOpt:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, noOpt\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break; 
+      case cold:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, cold\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break; 
+      case warm:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, warm\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break; 
+      case hot:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, hot\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break; 
+      case veryHot:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, veryhot\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break; 
+      case scorching:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, scorching\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break; 
+      default:
+         printf("%*smarked field as hot in class %.*s, method hotness=%d, none\n", depth(), " ", J9UTF8_LENGTH(name), J9UTF8_DATA(name),_comp->getMethodHotness());
+         break;
       }
-
-   *(UDATA *)((char *)clazz + offsetOfHotFields()) = noncoldWord | _bitValue;
-
+*/     
+      }
+   if((J9CLASS_FLAGS(clazz) & J9AccClassGCSpecial) ==0) {
+      UDATA hotFieldOffset = clazz->hotFieldOffset;  
+      //if((MM_GCExtensions *)(fej9->getCurrentVMThread()->gcExtensions)->scavengerDynamicCopyOrder && hotFieldOffset !=0) {
+      if(hotFieldOffset !=0) { 
+         //if(hotFieldOffset != _slotIndex && _comp->getMethodHotness() == scorching) {
+         if(hotFieldOffset > _slotIndex && _comp->getMethodHotness() >= veryHot) {
+            UDATA oldBitValue= (UDATA)1 << hotFieldOffset;
+            UDATA oldBitValueMask = ~oldBitValue; 
+            *(UDATA *)((char *)clazz + offsetOfHotFields()) = (noncoldWord | _bitValue) & oldBitValueMask;
+            //printf("For class name %.*s, changing hot field offset, OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset, _slotIndex);
+            clazz->hotFieldOffset = _slotIndex;
+         }
+      } else {
+         *(UDATA *)((char *)clazz + offsetOfHotFields()) = noncoldWord | _bitValue;
+         //printf("For class name %.*s,  , OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset, _slotIndex);   
+         clazz->hotFieldOffset = _slotIndex;
+      }
+   }
    return true;
    }
 

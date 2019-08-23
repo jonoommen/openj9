@@ -67,9 +67,71 @@ GC_ObjectModel::tearDown(MM_GCExtensionsBase *extensions)
 	}
 }
 
-IDATA
+void
+GC_ObjectModel::printAllObjectClasses(MM_ForwardedHeader *forwardedHeader) {
+	J9Class* clazz = getPreservedClass(forwardedHeader);
+	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+	printf("AllObjects: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); 
+}
+
+void
+GC_ObjectModel::printAllHotObjectClasses(MM_ForwardedHeader *forwardedHeader) {
+	J9Class* clazz = getPreservedClass(forwardedHeader);
+	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+	printf("AllHotObjects: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); 
+}
+void
+GC_ObjectModel::printAllIndexableObjectClasses(MM_ForwardedHeader *forwardedHeader) {
+	J9Class* clazz = getPreservedClass(forwardedHeader);
+	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+	printf("AllIndexableOObjects: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); 
+}
+
+void
+GC_ObjectModel::printAllDepthCopiedHotObjects(MM_ForwardedHeader *forwardedHeader) {
+	J9Class* clazz = getPreservedClass(forwardedHeader);
+	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+	printf("AllDepthCopiedHotObjects: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); 
+}
+
+void
+GC_ObjectModel::printAllDepthFailedHotObjects(MM_ForwardedHeader *forwardedHeader) {
+	J9Class* clazz = getPreservedClass(forwardedHeader);
+	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+	printf("AllDepthFailedHotObjects: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); 
+}
+
+void
+GC_ObjectModel::printDistanceObjects(MM_ForwardedHeader *forwardedHeader) {
+	J9Class* clazz = getPreservedClass(forwardedHeader);
+	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+	printf("Distance is close: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); 
+}
+
+
+UDATA
 GC_ObjectModel::getHotFieldOffset(MM_ForwardedHeader *forwardedHeader) {
+	
+//	J9Class* clazz = getPreservedClass(forwardedHeader);
+//	J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+//	printf("ObjectCopied: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); //total number of each type of object copied 
+
+/*	if(clazz->hotFieldOffset !=0) {
+		printf("objecthasoffset: Class name is %.*s, hotfieldoffset:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset); //list of all objects copied and their hot field
+	} else {
+		printf("objectnothaveoffset: Class name is %.*s\n", J9UTF8_LENGTH(name), J9UTF8_DATA(name)); //all objects copied 
+	}
+*/
 	return getPreservedClass(forwardedHeader)->hotFieldOffset;
+}
+
+void
+GC_ObjectModel::printHotFieldInfo(MM_ForwardedHeader *forwardedHeader, J9Object *objectPtr) {
+	J9Class* hotFieldClass = J9GC_J9OBJECT_CLAZZ(objectPtr);
+	J9Class* currentClass = getPreservedClass(forwardedHeader);	
+	J9UTF8* currentclassname = J9ROMCLASS_CLASSNAME(currentClass->romClass);
+	J9UTF8* hotfieldclassname = J9ROMCLASS_CLASSNAME(hotFieldClass->romClass);
+	printf("allhotafieldinfo: Class name is %.*s, hotfieldoffset:%zu, hotfieldClassName:%.*s \n", J9UTF8_LENGTH(currentclassname), J9UTF8_DATA(currentclassname), currentClass->hotFieldOffset, J9UTF8_LENGTH(hotfieldclassname), J9UTF8_DATA(hotfieldclassname)); //list of all objects copied and their hot field	
 }
 
 GC_ObjectModel::ScanType 
@@ -90,7 +152,8 @@ GC_ObjectModel::getSpecialClassScanType(J9Class *objectClazz)
 		result = SCAN_ATOMIC_MARKABLE_REFERENCE_OBJECT;
 	} else {
 		/* some unrecognized special class? */
-		result = SCAN_INVALID_OBJECT;
+		//result = SCAN_INVALID_OBJECT;
+		result = SCAN_MIXED_OBJECT;
 	}
 	
 	return result;
@@ -114,6 +177,14 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 		const char * const javaLangClassLoader = "java/lang/ClassLoader";
 		const char * const javaLangClass = "java/lang/Class";
 		const char * const abstractOwnableSynchronizer = "java/util/concurrent/locks/AbstractOwnableSynchronizer";
+		
+		const char * const javaLangString = "java/lang/String";
+		const char * const javaUtilHashMap = "java/util/HashMap$Node";
+		const char * const javaUtilHashMapNode = "java/util/HashMap$Node";
+		const char * const javaUtilTreeMap = "java/util/TreeMap";
+		const char * const javaUtilTreeMapEntry = "java/util/TreeMap$Entry"; 
+		const char * const ConcurrentHashMapNode = "java/util/concurrent/ConcurrentHashMap$Node";
+		
 
 		if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)atomicMarkableReference, strlen(atomicMarkableReference))) {
 			clazz->classDepthAndFlags |= J9AccClassGCSpecial;
@@ -126,7 +197,32 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 			objectModel->_classClass = clazz;
 		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)abstractOwnableSynchronizer, strlen(abstractOwnableSynchronizer))) {
 			 clazz->classDepthAndFlags |= J9AccClassOwnableSynchronizer;
+		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaLangString, strlen(javaLangString))) {
+			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
+			 clazz->hotFieldOffset =  1;
+			 printf("String class bitches\n");
+		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilHashMap, strlen(javaUtilHashMap))) {
+			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
+			 clazz->hotFieldOffset =  4;
+			 printf("javaUtilHashMap class bitches\n");
+		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilHashMapNode, strlen(javaUtilHashMapNode))) {
+			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
+			 clazz->hotFieldOffset =  3;
+			 printf("javaUtilHashMapNode class bitches\n");
+		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilTreeMap, strlen(javaUtilTreeMap))) {
+			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
+			 clazz->hotFieldOffset =  3;
+			 printf("javaUtilTreeMap class bitches\n");
+		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilTreeMapEntry, strlen(javaUtilTreeMapEntry))) {
+			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
+			 clazz->hotFieldOffset =  3;
+			 printf("javaUtilTreeMapEntry class bitches\n");
+		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)ConcurrentHashMapNode, strlen(ConcurrentHashMapNode))) {
+			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
+			 clazz->hotFieldOffset =  3;
+			 printf("ConcurrentHashMapNode class bitches\n");
 		}
+		
 	}
 }
 
