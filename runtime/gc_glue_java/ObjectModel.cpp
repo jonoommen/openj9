@@ -125,6 +125,13 @@ GC_ObjectModel::getHotFieldOffset(MM_ForwardedHeader *forwardedHeader) {
 	return getPreservedClass(forwardedHeader)->hotFieldOffset;
 }
 
+UDATA
+GC_ObjectModel::getHotFieldOffset2(MM_ForwardedHeader *forwardedHeader) {
+	return getPreservedClass(forwardedHeader)->hotFieldOffset2;
+}
+
+
+
 void
 GC_ObjectModel::printHotFieldInfo(MM_ForwardedHeader *forwardedHeader, J9Object *objectPtr) {
 	J9Class* hotFieldClass = J9GC_J9OBJECT_CLAZZ(objectPtr);
@@ -168,8 +175,9 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 	J9Class *clazz = classLoadEvent->clazz;
 	
 	J9ROMClass *romClass = clazz->romClass;
-	J9UTF8* className = J9ROMCLASS_CLASSNAME(romClass);
+	J9UTF8* className = J9ROMCLASS_CLASSNAME(romClass);	
 	clazz->hotFieldOffset =  0;
+	clazz->hotFieldOffset2 =  0;
 
 	/* we're only interested in bootstrap classes */
 	if (clazz->classLoader == vmThread->javaVM->systemClassLoader) {
@@ -179,13 +187,14 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 		const char * const abstractOwnableSynchronizer = "java/util/concurrent/locks/AbstractOwnableSynchronizer";
 		
 		const char * const javaLangString = "java/lang/String";
-		const char * const javaUtilHashMap = "java/util/HashMap$Node";
+		//const char * const NewOrderTransaction = "spec/jbb/NewOrderTransaction";
+		const char * const LinkedHashMapEntry = "java/util/LinkedHashMap$Entry";
 		const char * const javaUtilHashMapNode = "java/util/HashMap$Node";
 		const char * const javaUtilTreeMap = "java/util/TreeMap";
 		const char * const javaUtilTreeMapEntry = "java/util/TreeMap$Entry"; 
-		const char * const ConcurrentHashMapNode = "java/util/concurrent/ConcurrentHashMap$Node";
 		
-
+		//const char * const ConcurrentHashMapNode = "java/util/concurrent/ConcurrentHashMap$Node";
+		
 		if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)atomicMarkableReference, strlen(atomicMarkableReference))) {
 			clazz->classDepthAndFlags |= J9AccClassGCSpecial;
 			objectModel->_atomicMarkableReferenceClass = clazz;
@@ -201,27 +210,29 @@ GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, vo
 			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
 			 clazz->hotFieldOffset =  1;
 			 printf("String class bitches\n");
-		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilHashMap, strlen(javaUtilHashMap))) {
+		}  else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)LinkedHashMapEntry, strlen(LinkedHashMapEntry))) {
 			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
-			 clazz->hotFieldOffset =  4;
-			 printf("javaUtilHashMap class bitches\n");
+			 clazz->hotFieldOffset =  3;
+			 clazz->hotFieldOffset2 =  2;
+			 printf("LinkedHashMapEntry class bitches\n");
 		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilHashMapNode, strlen(javaUtilHashMapNode))) {
 			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
 			 clazz->hotFieldOffset =  3;
+			 clazz->hotFieldOffset2 =  2;
 			 printf("javaUtilHashMapNode class bitches\n");
 		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilTreeMap, strlen(javaUtilTreeMap))) {
 			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
-			 clazz->hotFieldOffset =  3;
+			 //clazz->hotFieldOffset =  3;
+			 clazz->hotFieldOffset =  4;
+			 clazz->hotFieldOffset2 =  5;
 			 printf("javaUtilTreeMap class bitches\n");
 		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)javaUtilTreeMapEntry, strlen(javaUtilTreeMapEntry))) {
 			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
 			 clazz->hotFieldOffset =  3;
+			 clazz->hotFieldOffset2 =  4;
 			 printf("javaUtilTreeMapEntry class bitches\n");
-		} else if (0 == compareUTF8Length(J9UTF8_DATA(className), J9UTF8_LENGTH(className), (U_8*)ConcurrentHashMapNode, strlen(ConcurrentHashMapNode))) {
-			 clazz->classDepthAndFlags |= J9AccClassGCSpecial;
-			 clazz->hotFieldOffset =  3;
-			 printf("ConcurrentHashMapNode class bitches\n");
 		}
+		
 		
 	}
 }

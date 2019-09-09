@@ -2191,8 +2191,10 @@ TR_MarkHotField::markHotField(J9Class * clazz, bool rootClass)
    // Check that the field is a member of the class.  At the time this code was written there were cases
    // when value propation would call this function with the class being Object and the field being String.value
    //
+   
+   
    if (!(descriptorWord & _bitValue))
-      return false;
+     return false;
 
    J9ROMClass* romClass = ((J9Class *)clazz)->romClass;
    J9UTF8* name = J9ROMCLASS_CLASSNAME(romClass);
@@ -2233,24 +2235,40 @@ TR_MarkHotField::markHotField(J9Class * clazz, bool rootClass)
       }
 */     
       }
-   if((J9CLASS_FLAGS(clazz) & J9AccClassGCSpecial) ==0) {
-      UDATA hotFieldOffset = clazz->hotFieldOffset;  
-      //if((MM_GCExtensions *)(fej9->getCurrentVMThread()->gcExtensions)->scavengerDynamicCopyOrder && hotFieldOffset !=0) {
-      if(hotFieldOffset !=0) { 
-         //if(hotFieldOffset != _slotIndex && _comp->getMethodHotness() == scorching) {
-         if(hotFieldOffset > _slotIndex && _comp->getMethodHotness() >= veryHot) {
-            UDATA oldBitValue= (UDATA)1 << hotFieldOffset;
-            UDATA oldBitValueMask = ~oldBitValue; 
-            *(UDATA *)((char *)clazz + offsetOfHotFields()) = (noncoldWord | _bitValue) & oldBitValueMask;
-            //printf("For class name %.*s, changing hot field offset, OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset, _slotIndex);
+ //  if((MM_GCExtensions *)(fej9->getCurrentVMThread()->gcExtensions)->scavengerDynamicCopyOrder) {
+      if((J9CLASS_FLAGS(clazz) & J9AccClassGCSpecial) == 0 && _comp->getMethodHotness() >= hot) {       
+         if(clazz->hotFieldOffset ==0) {
+            //printf("For class name %.*s, changing hotfieldoffset1, OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset, _slotIndex);
+            //printf("fuck For class name %.*s, hotfieldoffset1:%zu hotfieldoffset2:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name),clazz->hotFieldOffset, clazz->hotFieldOffset2);
+            int32_t len; char * s = _symRef->getOwningMethod(_comp)->fieldName(_symRef->getCPIndex(), len, _comp->trMemory());
+            //printf("hot field %*s with bitValue=%x and slotIndex=%d found while compiling \n   %s, method hotness=%d\n", len, s, _bitValue, _slotIndex, _comp->signature(),_comp->getMethodHotness());
             clazz->hotFieldOffset = _slotIndex;
+            *(UDATA *)((char *)clazz + offsetOfHotFields()) = noncoldWord | _bitValue;
          }
-      } else {
-         *(UDATA *)((char *)clazz + offsetOfHotFields()) = noncoldWord | _bitValue;
-         //printf("For class name %.*s,  , OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset, _slotIndex);   
-         clazz->hotFieldOffset = _slotIndex;
+         //else if ((_slotIndex != clazz->hotFieldOffset) && (clazz->hotFieldOffset2 == 0 || clazz->hotFieldOffset2 > _slotIndex)) {
+         else if ((clazz->hotFieldOffset2 == 0 || _slotIndex < clazz->hotFieldOffset2) && (_slotIndex != clazz->hotFieldOffset)) {
+            //printf("For class name %.*s, changing hotfieldoffset2, OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset2, _slotIndex);
+            //printf("fuck For class name %.*s, hotfieldoffset1:%zu hotfieldoffset2:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name),clazz->hotFieldOffset, clazz->hotFieldOffset2);
+            int32_t len; char * s = _symRef->getOwningMethod(_comp)->fieldName(_symRef->getCPIndex(), len, _comp->trMemory());
+            //printf("hot field %*s with bitValue=%x and slotIndex=%d found while compiling \n   %s, method hotness=%d\n", len, s, _bitValue, _slotIndex, _comp->signature(),_comp->getMethodHotness());
+            clazz->hotFieldOffset2 = _slotIndex;
+            *(UDATA *)((char *)clazz + offsetOfHotFields()) = noncoldWord | _bitValue;
+         }
+
+/*
+         else if(clazz->hotFieldOffset !=0 && _slotIndex !=clazz->hotFieldOffset) { 
+            if(clazz->hotFieldOffset2 == 0 || clazz->hotFieldOffset2 > _slotIndex) {      
+               printf("For class name %.*s, changing hotfieldoffset2, OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset2, _slotIndex);
+               clazz->hotFieldOffset2 = _slotIndex;
+            } 
+         } else {        
+            printf("For class name %.*s, changing hotfieldoffset1, OLD:%zu NEW:%zu \n", J9UTF8_LENGTH(name), J9UTF8_DATA(name), clazz->hotFieldOffset, _slotIndex);
+            clazz->hotFieldOffset = _slotIndex;
+         } 
+ */             
       }
-   }
+//   }
+   
    return true;
    }
 

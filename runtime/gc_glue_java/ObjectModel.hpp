@@ -166,6 +166,7 @@ private:
 
 public:
 	UDATA getHotFieldOffset(MM_ForwardedHeader *forwardedHeader);
+	UDATA getHotFieldOffset2(MM_ForwardedHeader *forwardedHeader);
 	void printHotFieldInfo(MM_ForwardedHeader *forwardedHeader, J9Object *objectPtr);
 	void printAllObjectClasses(MM_ForwardedHeader *forwardedHeader);
 	void printAllHotObjectClasses(MM_ForwardedHeader *forwardedHeader);
