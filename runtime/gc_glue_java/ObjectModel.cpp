@@ -131,16 +131,16 @@ GC_ObjectModel::getHotFieldOffset2(MM_ForwardedHeader *forwardedHeader) {
 }
 
 
-
+/*
 void
 GC_ObjectModel::printHotFieldInfo(MM_ForwardedHeader *forwardedHeader) {
-	//J9Class* hotFieldClass = J9GC_J9OBJECT_CLAZZ(objectPtr);
+	J9Class* hotFieldClass = J9GC_J9OBJECT_CLAZZ(objectPtr);
 	J9Class* currentClass = getPreservedClass(forwardedHeader);	
 	J9UTF8* currentclassname = J9ROMCLASS_CLASSNAME(currentClass->romClass);
 	J9UTF8* hotfieldclassname = J9ROMCLASS_CLASSNAME(hotFieldClass->romClass);
 	printf("allhotafieldinfo: Class name is %.*s, hotfieldoffset:%zu, hotfieldClassName:%.*s \n", J9UTF8_LENGTH(currentclassname), J9UTF8_DATA(currentclassname), currentClass->hotFieldOffset, J9UTF8_LENGTH(hotfieldclassname), J9UTF8_DATA(hotfieldclassname)); //list of all objects copied and their hot field	
 }
-
+*/
 GC_ObjectModel::ScanType 
 GC_ObjectModel::getSpecialClassScanType(J9Class *objectClazz)
 {
