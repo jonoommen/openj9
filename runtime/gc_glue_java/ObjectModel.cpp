@@ -133,8 +133,8 @@ GC_ObjectModel::getHotFieldOffset2(MM_ForwardedHeader *forwardedHeader) {
 
 
 void
-GC_ObjectModel::printHotFieldInfo(MM_ForwardedHeader *forwardedHeader, J9Object *objectPtr) {
-	J9Class* hotFieldClass = J9GC_J9OBJECT_CLAZZ(objectPtr);
+GC_ObjectModel::printHotFieldInfo(MM_ForwardedHeader *forwardedHeader) {
+	//J9Class* hotFieldClass = J9GC_J9OBJECT_CLAZZ(objectPtr);
 	J9Class* currentClass = getPreservedClass(forwardedHeader);	
 	J9UTF8* currentclassname = J9ROMCLASS_CLASSNAME(currentClass->romClass);
 	J9UTF8* hotfieldclassname = J9ROMCLASS_CLASSNAME(hotFieldClass->romClass);
