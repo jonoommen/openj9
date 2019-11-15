@@ -92,6 +92,14 @@ GC_ObjectModel::getSpecialClassScanType(J9Class *objectClazz)
 }
 
 void
+GC_ObjectModel::printClassDetails(MM_ForwardedHeader *forwardedHeader) { 
+    J9Class *clazz = getPreservedClass(forwardedHeader);
+    J9UTF8* name = J9ROMCLASS_CLASSNAME(clazz->romClass);
+    printf("class name is %.*s \n",J9UTF8_LENGTH(name), J9UTF8_DATA(name));
+}
+
+
+void
 GC_ObjectModel::internalClassLoadHook(J9HookInterface** hook, UDATA eventNum, void* eventData, void* userData)
 {
 	J9VMInternalClassLoadEvent *classLoadEvent = (J9VMInternalClassLoadEvent*)eventData;
