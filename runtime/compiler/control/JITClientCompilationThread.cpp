@@ -718,20 +718,6 @@ handleServerMessage(JITServer::ClientStream *client, TR_J9VM *fe, JITServer::Mes
          client->write(response, fe->getOffsetOfJLThreadJ9Thread());
          }
          break;
-      case MessageType::VM_scanReferenceSlotsInClassForOffset:
-         {
-         auto recv = client->getRecvData<TR_OpaqueClassBlock *, int32_t>();
-         TR_OpaqueClassBlock *clazz = std::get<0>(recv);
-         int32_t offset = std::get<1>(recv);
-         client->write(response, fe->scanReferenceSlotsInClassForOffset(comp, clazz, offset));
-         }
-         break;
-      case MessageType::VM_findFirstHotFieldTenuredClassOffset:
-         {
-         TR_OpaqueClassBlock *clazz = std::get<0>(client->getRecvData<TR_OpaqueClassBlock *>());
-         client->write(response, fe->findFirstHotFieldTenuredClassOffset(comp, clazz));
-         }
-         break;
       case MessageType::VM_getResolvedVirtualMethod:
          {
          auto recv = client->getRecvData<TR_OpaqueClassBlock *, I_32, bool>();
@@ -901,15 +887,6 @@ handleServerMessage(JITServer::ClientStream *client, TR_J9VM *fe, JITServer::Mes
          TR_OpaqueClassBlock *sourceClass = std::get<0>(recv);
          TR_OpaqueClassBlock *destClass = std::get<1>(recv);
          client->write(response, fe->isClassVisible(sourceClass, destClass));
-         }
-         break;
-      case MessageType::VM_markClassForTenuredAlignment:
-         {
-         auto recv = client->getRecvData<TR_OpaqueClassBlock *, uint32_t>();
-         TR_OpaqueClassBlock *clazz = std::get<0>(recv);
-         uint32_t alignFromStart = std::get<1>(recv);
-         fe->markClassForTenuredAlignment(comp, clazz, alignFromStart);
-         client->write(response, JITServer::Void());
          }
          break;
       case MessageType::VM_reportHotField:

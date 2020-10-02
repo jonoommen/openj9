@@ -1145,22 +1145,6 @@ TR_J9ServerVM::getOffsetOfJLThreadJ9Thread()
    return std::get<0>(stream->read<UDATA>());
    }
 
-bool
-TR_J9ServerVM::scanReferenceSlotsInClassForOffset(TR::Compilation *comp, TR_OpaqueClassBlock *clazz, int32_t offset)
-   {
-   JITServer::ServerStream *stream = _compInfoPT->getMethodBeingCompiled()->_stream;
-   stream->write(JITServer::MessageType::VM_scanReferenceSlotsInClassForOffset, clazz, offset);
-   return std::get<0>(stream->read<bool>());
-   }
-
-int32_t
-TR_J9ServerVM::findFirstHotFieldTenuredClassOffset(TR::Compilation *comp, TR_OpaqueClassBlock *clazz)
-   {
-   JITServer::ServerStream *stream = _compInfoPT->getMethodBeingCompiled()->_stream;
-   stream->write(JITServer::MessageType::VM_findFirstHotFieldTenuredClassOffset, clazz);
-   return std::get<0>(stream->read<int32_t>());
-   }
-
 TR_OpaqueMethodBlock *
 TR_J9ServerVM::getResolvedVirtualMethod(TR_OpaqueClassBlock * classObject, I_32 virtualCallOffset, bool ignoreRtResolve)
    {
@@ -1357,17 +1341,6 @@ TR_J9ServerVM::setJ2IThunk(char *signatureChars, uint32_t signatureLength, void 
       thunkMap.insert(std::make_pair(std::make_pair(signature, comp->compileRelocatableCode()), clientThunkPtr));
       }
    return thunkptr;
-   }
-
-void
-TR_J9ServerVM::markClassForTenuredAlignment(TR::Compilation *comp, TR_OpaqueClassBlock *clazz, uint32_t alignFromStart)
-   {
-   if (!TR::Compiler->om.isHotReferenceFieldRequired() && !comp->compileRelocatableCode())
-      {
-      JITServer::ServerStream *stream = _compInfoPT->getMethodBeingCompiled()->_stream;
-      stream->write(JITServer::MessageType::VM_markClassForTenuredAlignment, clazz, alignFromStart);
-      stream->read<JITServer::Void>();
-      }
    }
 
 void

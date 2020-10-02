@@ -158,8 +158,6 @@ enum MessageType : uint16_t
    VM_getIdentityHashSaltPolicy,
    VM_getOffsetOfJLThreadJ9Thread,
    VM_getVFTEntry,
-   VM_scanReferenceSlotsInClassForOffset,
-   VM_findFirstHotFieldTenuredClassOffset,
    VM_getResolvedVirtualMethod,
    VM_sameClassLoaders,
    VM_isUnloadAssumptionRequired,
@@ -170,7 +168,6 @@ enum MessageType : uint16_t
    VM_getMethodFromName,
    VM_getMethodFromClass,
    VM_isClassVisible,
-   VM_markClassForTenuredAlignment,
    VM_reportHotField,
    VM_getReferenceSlotsInClass,
    VM_getMethodSize,
@@ -430,8 +427,6 @@ static const char *messageNames[MessageType_ARRAYSIZE] =
    "VM_getIdentityHashSaltPolicy",
    "VM_getOffsetOfJLThreadJ9Thread",
    "VM_getVFTEntry",
-   "VM_scanReferenceSlotsInClassForOffset",
-   "VM_findFirstHotFieldTenuredClassOffset",
    "VM_getResolvedVirtualMethod",
    "VM_sameClassLoaders",
    "VM_isUnloadAssumptionRequired",
@@ -442,8 +437,11 @@ static const char *messageNames[MessageType_ARRAYSIZE] =
    "VM_getMethodFromName",
    "VM_getMethodFromClass",
    "VM_isClassVisible",
+<<<<<<< HEAD
    "VM_markClassForTenuredAlignment",
    "VM_reportHotField",
+=======
+>>>>>>> agressive changes - full removal of HFA
    "VM_getReferenceSlotsInClass",
    "VM_getMethodSize",
    "VM_addressOfFirstClassStatic",

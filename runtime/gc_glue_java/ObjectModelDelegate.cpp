@@ -52,7 +52,7 @@ GC_ObjectModelDelegate::initializeAllocation(MM_EnvironmentBase *env, void *allo
 
 #if defined(OMR_GC_MODRON_SCAVENGER)
 void
-GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, MM_ForwardedHeader *forwardedHeader, uintptr_t *objectCopySizeInBytes, uintptr_t *reservedObjectSizeInBytes, uintptr_t *hotFieldAlignmentDescriptor)
+GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, MM_ForwardedHeader *forwardedHeader, uintptr_t *objectCopySizeInBytes, uintptr_t *reservedObjectSizeInBytes)
 {
 	GC_ObjectModel *objectModel = &(env->getExtensions()->objectModel);
 	J9Class* clazz = objectModel->getPreservedClass(forwardedHeader);
@@ -77,6 +77,5 @@ GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, M
 	}
 	actualObjectCopySizeInBytes += *objectCopySizeInBytes;
 	*reservedObjectSizeInBytes = objectModel->adjustSizeInBytes(actualObjectCopySizeInBytes);
-	*hotFieldAlignmentDescriptor = clazz->instanceHotFieldDescription;
 }
 #endif /* defined(OMR_GC_MODRON_SCAVENGER) */
