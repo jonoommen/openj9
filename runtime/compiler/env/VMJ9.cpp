@@ -2228,8 +2228,6 @@ TR_J9VMBase::hasFinalFieldsInClass(TR_OpaqueClassBlock * clazz)
    return (clazzPtr->classDepthAndFlags & J9AccClassHasFinalFields)!=0;
    }
 
-static uint32_t offsetOfHotFields() { return offsetof(J9Class, instanceHotFieldDescription); }
-
 /**
  * Report a hot field if the JIT has determined that the field has met appropriate thresholds to be determined a hot field. 
  * Valid if dynamicBreadthFirstScanOrdering is enabled.
