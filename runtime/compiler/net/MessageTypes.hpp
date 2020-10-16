@@ -437,11 +437,7 @@ static const char *messageNames[MessageType_ARRAYSIZE] =
    "VM_getMethodFromName",
    "VM_getMethodFromClass",
    "VM_isClassVisible",
-<<<<<<< HEAD
-   "VM_markClassForTenuredAlignment",
    "VM_reportHotField",
-=======
->>>>>>> agressive changes - full removal of HFA
    "VM_getReferenceSlotsInClass",
    "VM_getMethodSize",
    "VM_addressOfFirstClassStatic",
