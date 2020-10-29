@@ -718,6 +718,14 @@ handleServerMessage(JITServer::ClientStream *client, TR_J9VM *fe, JITServer::Mes
          client->write(response, fe->getOffsetOfJLThreadJ9Thread());
          }
          break;
+      case MessageType::VM_scanReferenceSlotsInClassForOffset:
+         {
+         auto recv = client->getRecvData<TR_OpaqueClassBlock *, int32_t>();
+         TR_OpaqueClassBlock *clazz = std::get<0>(recv);
+         int32_t offset = std::get<1>(recv);
+         client->write(response, fe->scanReferenceSlotsInClassForOffset(comp, clazz, offset));
+         }
+         break;
       case MessageType::VM_getResolvedVirtualMethod:
          {
          auto recv = client->getRecvData<TR_OpaqueClassBlock *, I_32, bool>();

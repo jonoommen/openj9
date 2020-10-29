@@ -1145,6 +1145,14 @@ TR_J9ServerVM::getOffsetOfJLThreadJ9Thread()
    return std::get<0>(stream->read<UDATA>());
    }
 
+bool
+TR_J9ServerVM::scanReferenceSlotsInClassForOffset(TR::Compilation *comp, TR_OpaqueClassBlock *clazz, int32_t offset)
+   {
+   JITServer::ServerStream *stream = _compInfoPT->getMethodBeingCompiled()->_stream;
+   stream->write(JITServer::MessageType::VM_scanReferenceSlotsInClassForOffset, clazz, offset);
+   return std::get<0>(stream->read<bool>());
+   }
+
 TR_OpaqueMethodBlock *
 TR_J9ServerVM::getResolvedVirtualMethod(TR_OpaqueClassBlock * classObject, I_32 virtualCallOffset, bool ignoreRtResolve)
    {

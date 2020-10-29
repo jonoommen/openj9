@@ -2244,6 +2244,44 @@ TR_J9VMBase::reportHotField(int32_t reducedCpuUtil, J9Class* clazz, uint8_t fiel
    javaVM->internalVMFunctions->reportHotField(javaVM, reducedCpuUtil, clazz, fieldOffset, reducedFrequency);
 }
 
+
+bool
+TR_J9VMBase::scanReferenceSlotsInClassForOffset(TR::Compilation * comp, TR_OpaqueClassBlock * classPointer, int32_t offset)
+   {
+   if (isAOT_DEPRECATED_DO_NOT_USE())
+      return false;
+   TR_VMFieldsInfo fields(comp, TR::Compiler->cls.convertClassOffsetToClassPtr(classPointer), 1);
+
+   if (!fields.getFields()) return false;
+
+   ListIterator <TR_VMField> iter(fields.getFields());
+   for (TR_VMField * field = iter.getFirst(); field != NULL; field = iter.getNext())
+      {
+      if (field->offset > offset)
+         return false;
+
+      if (field->isReference())
+         {
+         char *fieldSignature = field->signature;
+         char *fieldName = field->name;
+
+         int32_t fieldOffset = getInstanceFieldOffset(classPointer, fieldName, (uint32_t)strlen(fieldName), fieldSignature, (uint32_t)strlen(fieldSignature));
+         if (fieldOffset == offset)
+            {
+            J9Class *fieldClass = TR::Compiler->cls.convertClassOffsetToClassPtr(getClassFromSignature(fieldSignature, (int32_t)strlen(fieldSignature), comp->getCurrentMethod()));
+
+            if (fieldClass != NULL)
+               {
+               return true;
+               }
+            }
+         }
+      }
+
+   return false;
+   }
+
+
 #if defined(TR_TARGET_X86)
 #define CACHE_LINE_SIZE 64
 #elif defined(TR_HOST_POWER)

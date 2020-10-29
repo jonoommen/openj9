@@ -667,6 +667,8 @@ public:
 
    virtual TR_OpaqueClassBlock *getProfiledClassFromProfiledInfo(TR_ExtraAddressInfo *profiledInfo);
 
+   virtual bool               scanReferenceSlotsInClassForOffset( TR::Compilation * comp, TR_OpaqueClassBlock * classPointer, int32_t offset);
+   
    virtual bool               isInlineableNativeMethod( TR::Compilation *, TR::ResolvedMethodSymbol * methodSymbol);
    //receiverClass is for specifying a more specific receiver type. otherwise it is determined from the call.
    virtual bool               maybeHighlyPolymorphic(TR::Compilation *, TR_ResolvedMethod *caller, int32_t cpIndex, TR::Method *callee, TR_OpaqueClassBlock *receiverClass = NULL);

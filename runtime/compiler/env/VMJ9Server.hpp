@@ -129,6 +129,7 @@ public:
    virtual uintptr_t getProcessID() override;
    virtual UDATA getIdentityHashSaltPolicy() override;
    virtual UDATA getOffsetOfJLThreadJ9Thread() override;
+   virtual bool scanReferenceSlotsInClassForOffset(TR::Compilation *comp, TR_OpaqueClassBlock *clazz, int32_t offset) override;
    virtual TR_OpaqueMethodBlock *getResolvedVirtualMethod(TR_OpaqueClassBlock * classObject, int32_t cpIndex, bool ignoreReResolve = true) override;
    virtual TR::CodeCache *getDesignatedCodeCache(TR::Compilation *comp) override;
    virtual uint8_t *allocateCodeMemory(TR::Compilation * comp, uint32_t warmCodeSize, uint32_t coldCodeSize, uint8_t ** coldCode, bool isMethodHeaderNeeded) override;
