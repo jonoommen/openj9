@@ -139,7 +139,7 @@ int32_t TR_HotFieldMarking::perform()
             if (isStatic)
                continue;
 
-            if (comp()->getOption(TR_TraceMarkingOfHotFields)) 
+            if (comp()->getOption(TR_TraceDynamicBreadthFirstHotFields)) 
                {
                int32_t classNameLength = 0;
                char *className = comp()->fej9()->getClassNameChars(itr->second->_clazz, classNameLength);
@@ -158,7 +158,7 @@ int32_t TR_HotFieldMarking::perform()
             
          if (!comp()->fej9()->isAnonymousClass(itr->second->_clazz) && performTransformation(comp(), "%sUpdate hot field info for hot field. signature: %.*s; fieldName: %.*s; frequencyScore = %d\n", optDetailString(), itr->second->_fieldSigLength, itr->second->_fieldSig, itr->second->_fieldNameLength, itr->second->_fieldName, itr->second->_score) && (fieldOffset < U_8_MAX))
             {
-            if (comp()->getOption(TR_TraceMarkingOfHotFields))
+            if (comp()->getOption(TR_TraceDynamicBreadthFirstHotFields))
                {
                int32_t classNameLength = 0;
                char *className = comp()->fej9()->getClassNameChars(itr->second->_clazz, classNameLength);
