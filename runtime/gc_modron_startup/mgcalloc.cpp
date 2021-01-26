@@ -50,6 +50,7 @@
 #include "ObjectAllocationInterface.hpp"
 #include "ObjectModel.hpp"
 #include "ObjectMonitor.hpp"
+#include "OMRVMThreadInterface.hpp"
 #if defined (J9VM_GC_REALTIME)
 #include "Scheduler.hpp"
 #endif /* J9VM_GC_REALTIME */
@@ -520,28 +521,11 @@ J9AllocateObject(J9VMThread *vmThread, J9Class *clazz, uintptr_t allocateFlags)
  */
 BOOLEAN
 J9RefreshTLH(J9VMThread *vmThread) {
-	BOOLEAN result = true;
-#if defined(J9VM_GC_THREAD_LOCAL_HEAP)
 	MM_EnvironmentBase *env = MM_EnvironmentBase::getEnvironment(vmThread->omrVMThread);
-	MM_GCExtensions *extensions = MM_GCExtensions::getExtensions(env);
-
-	if (!env->isInlineTLHAllocateEnabled()) {
-		/* For duration of call restore TLH allocate fields;
-		 * we will hide real heapAlloc again on exit to fool JIT/Interpreter
-		 * into thinking TLH is full if needed 
-		 */ 
-		env->enableInlineTLHAllocate();
+	if (NULL != env) {
+		GC_OMRVMThreadInterface::flushCachesForGC(env);
 	}
-
-	if (OMR_ERROR_NONE != OMR_GC_RefreshTLH(vmThread->omrVMThread)) {
-		result = false;
-	}
-
-	if (extensions->needDisableInlineAllocation()) {
-		env->disableInlineTLHAllocate();
-	}
-#endif /* J9VM_GC_THREAD_LOCAL_HEAP */
-	return result;
+	return true; // TODO remove after testing
 }
 
 /**
