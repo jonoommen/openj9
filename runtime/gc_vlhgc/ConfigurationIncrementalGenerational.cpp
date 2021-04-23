@@ -281,6 +281,7 @@ MM_ConfigurationIncrementalGenerational::initialize(MM_EnvironmentBase *env)
 		} else {
 			extensions->adaptiveGcCountBetweenHotFieldSort = false;
 		}
+		extensions->gcCountBetweenHotFieldReset = 0;
 		extensions->setVLHGC(true);
 	}
 
