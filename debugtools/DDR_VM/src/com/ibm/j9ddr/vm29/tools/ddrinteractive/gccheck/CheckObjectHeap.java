@@ -60,7 +60,9 @@ class CheckObjectHeap extends Check
 							//forwarded pointer is discovered
 							//report it
 							_engine.reportForwardedObject(object, scavengerForwardedHeader.getForwardedObject());
-							
+							boolean isMovedAndNotHashed = scavengerForwardedHeader.isMovedAndNotHashed();
+							//if (isMovedAndNotHashed)
+								_engine.reportIsMovedAndNotHashed(object, scavengerForwardedHeader.getForwardedObject());
 							//and skip it by advancing of iterator to the next object
 							UDATA objectSize = scavengerForwardedHeader.getObjectSize(); //USEFUL
 							heapIterator.advance(objectSize);

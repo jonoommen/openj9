@@ -94,7 +94,9 @@ class GCScavengerForwardedHeader_V1 extends GCScavengerForwardedHeader
 	{
 		J9ObjectPointer forwardedObject = getForwardedObjectNoCheck();
 		UDATA forwardedObjectSize;
+		//System.out.println(String.format("FORWARDED OBJECT ADDRESS: %x", forwardedObject.getAddress()));
 		if(ObjectModel.hasBeenMoved(forwardedObject) && !ObjectModel.hasBeenHashed(forwardedObject)) {
+			//System.out.println(String.format("FORWARDED OBJECT MOVED AND NOT HASHED ADDRESS: %x", forwardedObject.getAddress()));
 			//this hashed but not moved yet object just has been forwarded
 			//so hash slot was added which increase size of the object
 			forwardedObjectSize = ObjectModel.getSizeInBytesWithHeader(forwardedObject);
@@ -104,5 +106,15 @@ class GCScavengerForwardedHeader_V1 extends GCScavengerForwardedHeader
 		}
 		return forwardedObjectSize;
 	}
+
+	@Override //USEFUL
+	public boolean isMovedAndNotHashed() throws CorruptDataException
+	{
+		J9ObjectPointer forwardedObject = getForwardedObjectNoCheck();
+		//System.out.println(String.format("FORWARDED OBJECT ADDRESS: %x", forwardedObject.getAddress()));
+		return (ObjectModel.hasBeenMoved(forwardedObject) && !ObjectModel.hasBeenHashed(forwardedObject));
+
+	}
+
 
 }

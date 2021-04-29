@@ -107,5 +107,7 @@ public abstract class GCScavengerForwardedHeader
 	}
 	
 	public abstract UDATA getObjectSize() throws CorruptDataException;
+
+	public abstract boolean isMovedAndNotHashed() throws CorruptDataException;
 	
 }

@@ -165,6 +165,13 @@ class CheckEngine
 			_reporter.reportForwardedObject(object, forwardedObject);
 		}
 	}
+
+	public void reportIsMovedAndNotHashed(J9ObjectPointer object, J9ObjectPointer forwardedObject)
+	{
+		if((_cycle.getMiscFlags() & J9MODRON_GCCHK_VERBOSE) != 0) {
+			_reporter.reportIsMovedAndNotHashed(object, forwardedObject);
+		}
+	}
 	
 	public int checkObjectHeap(J9ObjectPointer object, GCHeapRegionDescriptor regionDesc)
 	{
@@ -577,7 +584,7 @@ class CheckEngine
 		} catch (CorruptDataException e) {
 			// TODO : cde should be part of the error
 			CheckError error = new CheckError(objectIndirectBase, objectIndirect, _cycle, _currentCheck, J9MODRON_GCCHK_RC_CORRUPT_DATA_EXCEPTION, _cycle.nextErrorCount(), objectType);
-			_reporter.report(error);
+			_reporter.report(error); //USEFUL
 		}
 		return J9MODRON_SLOT_ITERATOR_OK;
 	}
