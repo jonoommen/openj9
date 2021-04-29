@@ -264,7 +264,7 @@ public class CheckReporterTTY extends CheckReporter
 	@Override
 	public void reportForwardedObject(J9ObjectPointer object, J9ObjectPointer newObject)
 	{
-		out.println(String.format("  <gc check: found forwarded pointer %x -> %x>", object.getAddress(), newObject.getAddress()));
+		out.println(String.format("  <gc check: FND forwarded pointer %x -> %x>", object.getAddress(), newObject.getAddress()));
 	}
 
 	@Override
