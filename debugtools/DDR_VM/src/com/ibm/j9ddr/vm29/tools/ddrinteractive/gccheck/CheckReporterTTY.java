@@ -148,7 +148,7 @@ public class CheckReporterTTY extends CheckReporter
 				
 				/* If the basic checks have been made (alignment, etc.) display header info. */
 				if (error._objectType == check_type_object) {
-					reportObjectHeader(error, J9ObjectPointer.cast(error._object), "");
+					reportObjectHeader(error, J9ObjectPointer.cast(error._object), ""); //USEFUL
 				}	
 			}
 		} catch (CorruptDataException cde) {
@@ -265,5 +265,11 @@ public class CheckReporterTTY extends CheckReporter
 	public void reportForwardedObject(J9ObjectPointer object, J9ObjectPointer newObject)
 	{
 		out.println(String.format("  <gc check: found forwarded pointer %x -> %x>", object.getAddress(), newObject.getAddress()));
+	}
+
+	@Override
+	public void reportIsMovedAndNotHashed(J9ObjectPointer object, J9ObjectPointer newObject)
+	{	
+		out.println(String.format("FORWARDED OBJECT MOVED AND NOT HASHED ADDRESS: %x", newObject.getAddress()));
 	}
 }

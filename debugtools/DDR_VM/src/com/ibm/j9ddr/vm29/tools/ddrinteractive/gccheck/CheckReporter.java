@@ -60,6 +60,8 @@ public abstract class CheckReporter
 	 * Report that a forwarded pointer was encountered when running with "midscavenge".
 	 */
 	public abstract void reportForwardedObject(J9ObjectPointer object, J9ObjectPointer newObject);
+
+	public abstract void reportIsMovedAndNotHashed(J9ObjectPointer object, J9ObjectPointer newObject);
 	
 	/**
 	 * Output non-error information
