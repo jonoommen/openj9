@@ -61,8 +61,9 @@ class CheckObjectHeap extends Check
 							//report it
 							_engine.reportForwardedObject(object, scavengerForwardedHeader.getForwardedObject());
 							boolean isMovedAndNotHashed = scavengerForwardedHeader.isMovedAndNotHashed();
-							//if (isMovedAndNotHashed)
+							if (isMovedAndNotHashed) {
 								_engine.reportIsMovedAndNotHashed(object, scavengerForwardedHeader.getForwardedObject());
+							}
 							//and skip it by advancing of iterator to the next object
 							UDATA objectSize = scavengerForwardedHeader.getObjectSize();
 							heapIterator.advance(objectSize);
