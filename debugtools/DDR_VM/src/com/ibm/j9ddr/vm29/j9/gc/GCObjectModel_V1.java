@@ -100,6 +100,7 @@ class GCObjectModel_V1 extends GCObjectModel
 		if (hasBeenMoved(object)) {
 			if (getHashcodeOffset(object).eq(size)) {
 				size = size.add(UDATA.SIZEOF);
+				System.out.println(String.format("ADJUST SIZE FOR HASH OFFSET FORCED"));
 			}
 		}
 		return adjustSizeInBytes(size);

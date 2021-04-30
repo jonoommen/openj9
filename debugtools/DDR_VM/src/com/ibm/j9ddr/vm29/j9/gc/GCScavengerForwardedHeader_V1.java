@@ -101,6 +101,7 @@ class GCScavengerForwardedHeader_V1 extends GCScavengerForwardedHeader
 			//so hash slot was added which increase size of the object
 			forwardedObjectSize = ObjectModel.getSizeInBytesWithHeader(forwardedObject);
 			forwardedObjectSize = ObjectModel.adjustSizeInBytes(forwardedObjectSize);
+			System.out.println(String.format("ADJUST SIZE FOR HASH OFFSET NATURALLY"));
 		} else {
 			forwardedObjectSize = ObjectModel.getConsumedSizeInBytesWithHeader(forwardedObject);
 		}
