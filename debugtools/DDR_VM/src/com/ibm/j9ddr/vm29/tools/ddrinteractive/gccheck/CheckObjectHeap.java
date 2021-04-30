@@ -82,6 +82,7 @@ class CheckObjectHeap extends Check
 				}
 			}
 		} catch (CorruptDataException e) {
+			System.out.println(String.format("CORRUPTING FORWARED HEADER"));
 			// TODO: handle exception
 		}
 	}
