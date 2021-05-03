@@ -92,9 +92,7 @@ class GCScavengerForwardedHeader_V1 extends GCScavengerForwardedHeader
 	@Override
 	public UDATA getObjectSize() throws CorruptDataException
 	{
-		System.out.println(String.format("CRASH1"));
 		J9ObjectPointer forwardedObject = getForwardedObjectNoCheck();
-		System.out.println(String.format("CRASH2"));
 		UDATA forwardedObjectSize;
 		//System.out.println(String.format("FORWARDED OBJECT ADDRESS: %x", forwardedObject.getAddress()));
 		if(ObjectModel.hasBeenMoved(forwardedObject) && !ObjectModel.hasBeenHashed(forwardedObject)) {
