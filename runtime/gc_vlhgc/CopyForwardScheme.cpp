@@ -1232,6 +1232,12 @@ MM_CopyForwardScheme::copyAndForward(MM_EnvironmentVLHGC *env, MM_AllocationCont
 	bool success = true;
 
 	if((NULL != objectPtr) && isObjectInEvacuateMemory(objectPtr)) {
+		if(_extensions->globalVLHGCStats.gcCount > 20 && _extensions->gcCountBetweenHotFieldReset < 5000){
+			_extensions->gcCountBetweenHotFieldReset += 1;
+			if (_extensions->gcCountBetweenHotFieldReset == 5000) {
+				Assert_MM_unreachable();
+			}
+		}
 		/* Object needs to be copy and forwarded.  Check if the work has already been done */
 		MM_ForwardedHeader forwardHeader(objectPtr, _extensions->compressObjectReferences());
 		objectPtr = forwardHeader.getForwardedObject();
@@ -1977,12 +1983,6 @@ MM_CopyForwardScheme::copy(MM_EnvironmentVLHGC *env, MM_AllocationContextTarok *
 			Assert_MM_true(NULL != destinationObjectPtr);
 			if (destinationObjectPtr == originalDestinationObjectPtr) {
 				/* Succeeded in forwarding the object - copy and adjust the age value */
-				if(_extensions->globalVLHGCStats.gcCount > 20 && _extensions->gcCountBetweenHotFieldReset < 5000){
-					_extensions->gcCountBetweenHotFieldReset += 1;
-					if (_extensions->gcCountBetweenHotFieldReset == 5000) {
-						Assert_MM_unreachable();
-					}
-				}
 
 #if defined(J9VM_INTERP_NATIVE_SUPPORT)
 				if (NULL != hotFieldPadBase) {
