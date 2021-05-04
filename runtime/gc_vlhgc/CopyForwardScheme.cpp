@@ -1232,12 +1232,6 @@ MM_CopyForwardScheme::copyAndForward(MM_EnvironmentVLHGC *env, MM_AllocationCont
 	bool success = true;
 
 	if((NULL != objectPtr) && isObjectInEvacuateMemory(objectPtr)) {
-		if(_extensions->globalVLHGCStats.gcCount > 20 && _extensions->gcCountBetweenHotFieldReset < 5000){
-			_extensions->gcCountBetweenHotFieldReset += 1;
-			if (_extensions->gcCountBetweenHotFieldReset == 5000) {
-				Assert_MM_unreachable();
-			}
-		}
 		/* Object needs to be copy and forwarded.  Check if the work has already been done */
 		MM_ForwardedHeader forwardHeader(objectPtr, _extensions->compressObjectReferences());
 		objectPtr = forwardHeader.getForwardedObject();
@@ -2339,7 +2333,12 @@ MM_CopyForwardScheme::scanMixedObjectSlots(MM_EnvironmentVLHGC *env, MM_Allocati
 		/* Iteratoring and copyforwarding  the slot reference with leaf bit */
 		success = iterateAndCopyforwardSlotReference(env, reservingContext, objectPtr);
 	}
-
++   if(_extensions->globalVLHGCStats.gcCount > 10 && _extensions->gcCountBetweenHotFieldReset < 5000 && !env->isMainThread()){
+		_extensions->gcCountBetweenHotFieldReset += 1;
+		if (_extensions->gcCountBetweenHotFieldReset == 5000) {
+			Assert_MM_unreachable();
+		}
+	}
 	updateScanStats(env, objectPtr, reason);
 }
 
