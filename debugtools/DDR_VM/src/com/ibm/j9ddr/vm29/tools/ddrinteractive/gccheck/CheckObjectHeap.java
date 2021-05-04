@@ -59,7 +59,7 @@ class CheckObjectHeap extends Check
 						if (scavengerForwardedHeader.isForwardedPointer()) {
 							//forwarded pointer is discovered
 							//report it
-							//_engine.reportForwardedObject(object, scavengerForwardedHeader.getForwardedObject());
+							_engine.reportForwardedObject(object, scavengerForwardedHeader.getForwardedObject());
 							boolean isMovedAndNotHashed = scavengerForwardedHeader.isMovedAndNotHashed();
 							if (isMovedAndNotHashed) {
 								_engine.reportIsMovedAndNotHashed(object, scavengerForwardedHeader.getForwardedObject());
