@@ -471,7 +471,6 @@ public:
 	 * @param[out] objectCopySizeInBytes actual object size
 	 * @param[out] objectReserveSizeInBytes size adjusted to object alignment
 	 */
-	void calculateObjectDetailsForCopy(MM_EnvironmentBase *env, MM_ForwardedHeader* forwardedHeader, uintptr_t *objectCopySizeInBytes, uintptr_t *objectReserveSizeInBytes, bool *doesObjectNeedHash) {}
 	void calculateObjectDetailsForCopy(MM_EnvironmentBase *env, MM_ForwardedHeader* forwardedHeader, uintptr_t *objectCopySizeInBytes, uintptr_t *objectReserveSizeInBytes);
 
 	/**

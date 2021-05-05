@@ -54,7 +54,7 @@ class CheckObjectHeap extends Check
 				while(heapIterator.hasNext()) {
 					J9ObjectPointer object = heapIterator.peek();
 
-					if (midScavenge && (isVLHGC || isRegionTypeNew)) { //USEFUL
+					if (midScavenge && (isVLHGC || isRegionTypeNew)) {
 						GCScavengerForwardedHeader scavengerForwardedHeader = GCScavengerForwardedHeader.fromJ9Object(object);
 						if (scavengerForwardedHeader.isForwardedPointer()) {
 							//forwarded pointer is discovered
@@ -62,7 +62,7 @@ class CheckObjectHeap extends Check
 							_engine.reportForwardedObject(object, scavengerForwardedHeader.getForwardedObject());
 							
 							//and skip it by advancing of iterator to the next object
-							UDATA objectSize = scavengerForwardedHeader.getObjectSize(); //USEFUL
+							UDATA objectSize = scavengerForwardedHeader.getObjectSize();
 							heapIterator.advance(objectSize);
 							_engine.pushPreviousObject(object);
 							continue;

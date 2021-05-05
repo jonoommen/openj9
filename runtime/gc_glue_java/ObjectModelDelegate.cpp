@@ -80,7 +80,6 @@ GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, M
 
 	/* IF the object has been hashed and has not been moved, then we need generate hash from the old address */
 	uintptr_t forwardedHeaderPreservedFlags = objectModel->getPreservedFlags(forwardedHeader);
-	// *doesObjectNeedHash = (objectModel->hasBeenHashed(forwardedHeaderPreservedFlags) && !objectModel->hasBeenMoved(forwardedHeaderPreservedFlags));
 
 	if (hashcodeOffset == *objectCopySizeInBytes) {
 		if (objectModel->hasBeenMoved(forwardedHeaderPreservedFlags)) {
@@ -90,5 +89,5 @@ GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, M
 		}
 	}
 	actualObjectCopySizeInBytes += *objectCopySizeInBytes;
-	*objectReserveSizeInBytes = objectModel->adjustSizeInBytes(actualObjectCopySizeInBytes); //USEFUL
+	*objectReserveSizeInBytes = objectModel->adjustSizeInBytes(actualObjectCopySizeInBytes);
 }

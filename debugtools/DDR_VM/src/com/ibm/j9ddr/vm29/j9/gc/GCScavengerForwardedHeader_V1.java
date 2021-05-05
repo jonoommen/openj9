@@ -89,7 +89,7 @@ class GCScavengerForwardedHeader_V1 extends GCScavengerForwardedHeader
 		return flagBits.bitAnd(J9Consts.J9_GC_OBJ_HEAP_HOLE_MASK).eq(J9Consts.J9_GC_MULTI_SLOT_HOLE);
 	}
 
-	@Override //USEFUL
+	@Override
 	public UDATA getObjectSize() throws CorruptDataException
 	{
 		J9ObjectPointer forwardedObject = getForwardedObjectNoCheck();
