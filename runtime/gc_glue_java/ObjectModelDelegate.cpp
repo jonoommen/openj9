@@ -51,16 +51,17 @@ GC_ObjectModelDelegate::initializeAllocation(MM_EnvironmentBase *env, void *allo
 }
 
 #if defined(OMR_GC_MODRON_SCAVENGER)
-void
+bool
 GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, MM_ForwardedHeader *forwardedHeader, uintptr_t *objectCopySizeInBytes, uintptr_t *reservedObjectSizeInBytes, uintptr_t *hotFieldAlignmentDescriptor)
 {
-	calculateObjectDetailsForCopy(env, forwardedHeader, objectCopySizeInBytes, reservedObjectSizeInBytes);
+	bool isIndexable = calculateObjectDetailsForCopy(env, forwardedHeader, objectCopySizeInBytes, reservedObjectSizeInBytes);
 	J9Class* clazz = env->getExtensions()->objectModel.getPreservedClass(forwardedHeader);
 	*hotFieldAlignmentDescriptor = clazz->instanceHotFieldDescription;
+	return isIndexable;
 }
 #endif /* defined(OMR_GC_MODRON_SCAVENGER) */
 
-void
+bool
 GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, MM_ForwardedHeader* forwardedHeader, uintptr_t *objectCopySizeInBytes, uintptr_t *objectReserveSizeInBytes)
 {
 	/* NOTE: the size is fetched by hand from the class in the mixed case because a forwarding pointer could have been substituted into the clazz slot.
@@ -70,9 +71,11 @@ GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, M
 	J9Class* clazz = objectModel->getPreservedClass(forwardedHeader);
 	uintptr_t actualObjectCopySizeInBytes = 0;
 	uintptr_t hashcodeOffset = 0;
+	bool isIndexable = false;
 
 	if (objectModel->isIndexable(clazz)) {
 		*objectCopySizeInBytes = env->getExtensions()->indexableObjectModel.calculateObjectSizeAndHashcode(forwardedHeader, &hashcodeOffset);
+		isIndexable = true;
 	} else {
 		*objectCopySizeInBytes = clazz->totalInstanceSize + J9GC_OBJECT_HEADER_SIZE(env->getExtensions());
 		hashcodeOffset = env->getExtensions()->mixedObjectModel.getHashcodeOffset(clazz);
@@ -90,4 +93,5 @@ GC_ObjectModelDelegate::calculateObjectDetailsForCopy(MM_EnvironmentBase *env, M
 	}
 	actualObjectCopySizeInBytes += *objectCopySizeInBytes;
 	*objectReserveSizeInBytes = objectModel->adjustSizeInBytes(actualObjectCopySizeInBytes);
+	return isIndexable;
 }
