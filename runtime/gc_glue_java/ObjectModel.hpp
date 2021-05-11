@@ -554,11 +554,11 @@ public:
 	 * @param[in] objectAge the age to set in the copied object
 	 */
 	MMINLINE void
-	fixupForwardedObject(MM_ForwardedHeader *forwardedHeader, omrobjectptr_t destinationObjectPtr, uintptr_t objectAge)
+	fixupForwardedObject(MM_ForwardedHeader *forwardedHeader, omrobjectptr_t destinationObjectPtr, uintptr_t objectAge, bool isIndexable)
 	{
 		GC_ObjectModelBase::fixupForwardedObject(forwardedHeader, destinationObjectPtr, objectAge);
 
-		if (isIndexable(forwardedHeader)) {
+		if (isIndexable) {
 			/* Updates internal field of indexable objects. Every indexable object have an extra field
 			 * that can be used to store any extra information about the indexable object. One use case is
 			 * OpenJ9 where we use this field to point to array data. In this case it will always point to
@@ -588,7 +588,7 @@ public:
 			/* The object has been hashed and has not been moved so we must store the previous address into the hashcode slot at hashcode offset. */
 			uintptr_t hashOffset;
 			J9Class *clazz = getPreservedClass(forwardedHeader);
-			if (isIndexable(clazz)) {
+			if (isIndexable) {
 				hashOffset = _indexableObjectModel->getPreservedHashcodeOffset(forwardedHeader);
 			} else {
 				hashOffset = _mixedObjectModel->getHashcodeOffset(clazz);

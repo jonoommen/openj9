@@ -1993,7 +1993,7 @@ MM_CopyForwardScheme::copy(MM_EnvironmentVLHGC *env, MM_AllocationContextTarok *
 					_extensions->indexableObjectModel.fixupInternalLeafPointersAfterCopy((J9IndexableObject *)destinationObjectPtr, (J9IndexableObject *)forwardedHeader->getObject());
 				}
 
-				_extensions->objectModel.fixupForwardedObject(forwardedHeader, destinationObjectPtr, _extensions->objectModel.getPreservedAge(forwardedHeader));
+				_extensions->objectModel.fixupForwardedObject(forwardedHeader, destinationObjectPtr, _extensions->objectModel.getPreservedAge(forwardedHeader), isIndexable);
 
 				/* Update any mark maps and transfer card table data as appropriate for a successful copy */
 				updateMarkMapAndCardTableOnCopy(env, forwardedHeader->getObject(), destinationObjectPtr, copyCache);
