@@ -1881,6 +1881,7 @@ J9Object *
 MM_CopyForwardScheme::copy(MM_EnvironmentVLHGC *env, MM_AllocationContextTarok *reservingContext, MM_ForwardedHeader* forwardedHeader, bool leafType)
 {
 	bool const compressed = env->compressObjectReferences();
+	bool isIndexable;
 	J9Object *result = NULL;
 	J9Object *object = forwardedHeader->getObject();
 	UDATA objectCopySizeInBytes = 0;
@@ -1912,7 +1913,7 @@ MM_CopyForwardScheme::copy(MM_EnvironmentVLHGC *env, MM_AllocationContextTarok *
 		GC_ObjectModel *objectModel = &_extensions->objectModel;
 		
 		/* Object is in the evacuate space but not forwarded. */
-		_extensions->objectModel.calculateObjectDetailsForCopy(env, forwardedHeader, &objectCopySizeInBytes, &objectReserveSizeInBytes);
+		isIndexable = _extensions->objectModel.calculateObjectDetailsForCopy(env, forwardedHeader, &objectCopySizeInBytes, &objectReserveSizeInBytes);
 
 		Assert_MM_objectAligned(env, objectReserveSizeInBytes);
 
@@ -1988,7 +1989,7 @@ MM_CopyForwardScheme::copy(MM_EnvironmentVLHGC *env, MM_AllocationContextTarok *
 
 				forwardedHeader->fixupForwardedObject(destinationObjectPtr);
 
-				if (objectModel->isIndexable(destinationObjectPtr)) {
+				if (isIndexable) {
 					_extensions->indexableObjectModel.fixupInternalLeafPointersAfterCopy((J9IndexableObject *)destinationObjectPtr, (J9IndexableObject *)forwardedHeader->getObject());
 				}
 
