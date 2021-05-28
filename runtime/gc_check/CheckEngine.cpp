@@ -475,6 +475,17 @@ GC_CheckEngine::checkJ9Object(J9JavaVM *javaVM, J9Object* objectPtr, J9MM_Iterat
 			return J9MODRON_GCCHK_RC_INVALID_RANGE;
 		}
 
+		if (extensions->objectModel.isIndexable(objectPtr)) {
+			extensions->indexableObjectModel.getDataAddrForIndexableObject((J9IndexableObject*)objectPtr);
+			
+			/*if (_extensions->indexableObjectModel.isInlineContiguousArraylet(objectPtr)){
+				extensions->indexableObjectModel.getDataAddrForContiguous(objectPtr);
+			} else {
+				extensions->indexableObjectModel.getDataAddrForDiscontiguous(objectPtr);
+			} */
+			
+		}
+
 		javaVM->memoryManagerFunctions->j9mm_initialize_object_descriptor(javaVM, &objectDesc, objectPtr);
 
 		if (delta < objectDesc.size) {
