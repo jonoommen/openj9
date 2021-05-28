@@ -32,7 +32,6 @@
 #include "j9consts.h"
 #include "modron.h"
 #include "modronopt.h"
-#include "ModronAssertions.h"
 
 #include "ArrayletObjectModelBase.hpp"
 #include "Bits.hpp"
@@ -54,6 +53,8 @@ public:
 */
 private:
 	void AssertBadElementSize();
+	void AssertDataAddrContiguous(void *dataAddr, J9IndexableObject *arrayPtr);
+	void AssertDataAddrDiscontiguous(void *dataAddr, J9IndexableObject *arrayPtr);
 protected:
 	/* forward declare methods from parent class to avoid namespace issues */
 	MMINLINE uintptr_t
@@ -945,7 +946,7 @@ public:
 	getDataAddrForContiguous(J9IndexableObject *arrayPtr)
 	{
 		void *dataAddr = *dataAddrSlotForContiguous(arrayPtr);
-		Assert_MM_true(dataAddr == ((void *)((uintptr_t)arrayPtr + contiguousHeaderSize())));
+		AssertDataAddrContiguous(dataAddr, arrayPtr);
 		return dataAddr;
 	}
 
@@ -968,7 +969,7 @@ public:
 		 * Assert only the discontiguous case until sparse-heap is introduced. */
 		AssertDiscontiguousArrayletLayout(arrayPtr);
 		void *dataAddr = *dataAddrSlotForDiscontiguous(arrayPtr);
-		Assert_MM_true(dataAddr == NULL);
+		AssertDataAddrDiscontiguous(dataAddr, arrayPtr);
 		return dataAddr;
 	}
 

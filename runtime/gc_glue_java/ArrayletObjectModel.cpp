@@ -45,6 +45,18 @@ GC_ArrayletObjectModel::AssertBadElementSize()
 }
 
 void
+GC_ArrayletObjectModel::AssertDataAddrContiguous(void *dataAddr, J9IndexableObject *arrayPtr)
+{
+	Assert_MM_true(dataAddr == ((void *)((uintptr_t)arrayPtr + contiguousHeaderSize())));
+}
+
+void
+GC_ArrayletObjectModel::AssertDataAddrDiscontiguous(void *dataAddr, J9IndexableObject *arrayPtr)
+{
+	Assert_MM_true(dataAddr == NULL);
+}
+
+void
 GC_ArrayletObjectModel::AssertArrayletIsDiscontiguous(J9IndexableObject *objPtr)
 {
 #if defined(J9VM_GC_ENABLE_DOUBLE_MAP)
